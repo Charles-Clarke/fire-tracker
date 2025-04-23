@@ -1,0 +1,25 @@
+.map-container {
+    margin-top: 30px;
+    text-align: center;
+  }
+  
+  .map-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .campus-map {
+    width: 1496px;
+    height: 1290;
+    border: 2px solid #ccc;
+  }
+  
+  .map-pin {
+    position: absolute;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+  }
+  

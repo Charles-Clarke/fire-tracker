@@ -1,0 +1,35 @@
+.map-dashboard {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .map-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .campus-map {
+    width: 1496px;
+    height: 1290;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .map-dot {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+  }
+  
+  .map-dot.active {
+    background-color: green;
+  }
+  
+  .map-dot.inactive {
+    background-color: red;
+  }
+  
