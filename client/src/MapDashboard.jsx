@@ -1,5 +1,5 @@
 import './MapDashboard.css';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 
 const buildings = [
@@ -36,13 +36,16 @@ const buildings = [
   { name: 'Students’ Union', left: '79.4%', top: '70.7%' }
 ];
 
-
-
-
-
 function MapDashboard({ wardens }) {
+  const [tick, setTick] = useState(0);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick((prev) => prev + 1); // 🔁 force re-render every 60s
+    }, 60000);
 
+    return () => clearInterval(interval);
+  }, []);
 
   const getWardenInfo = (building) => {
     const today = new Date().toDateString();
