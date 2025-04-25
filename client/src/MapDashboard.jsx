@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import './MapDashboard.css';
+import React from 'react';
+
 
 const buildings = [
   { name: 'Alwyn Hall', left: '42.6%', top: '72.1%' },
@@ -40,30 +40,19 @@ const buildings = [
 
 
 
-function MapDashboard() {
-  const [wardenData, setWardenData] = useState([]);
+function MapDashboard({ wardens }) {
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get('http://localhost:5000/api/wardens');
-        setWardenData(res.data);
-      } catch (err) {
-        console.error('Error fetching wardens:', err);
-      }
-    };
-    fetchData();
-  }, []);
+
 
   const getWardenInfo = (building) => {
     const today = new Date().toDateString();
-    const record = wardenData.find((w) => {
-      const loggedDate = new Date(w.timestamp).toDateString();
+    const record = wardens.find((w) => {
+      const loggedDate = new Date(w.time_logged).toDateString();
       return w.location === building && loggedDate === today;
     });
 
     if (record) {
-      const minsAgo = Math.round((new Date() - new Date(record.timestamp)) / 60000);
+      const minsAgo = Math.round((new Date() - new Date(record.time_logged)) / 60000);
       return {
         status: 'active',
         name: `${record.first_name} ${record.last_name}`,

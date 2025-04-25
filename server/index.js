@@ -85,9 +85,11 @@ app.put("/api/wardens/:id", async (req, res) => {
         SET staff_number = @staff_number,
             first_name = @first_name,
             last_name = @last_name,
-            location = @location
+            location = @location,
+            time_logged = GETDATE()
         WHERE id = @id
       `);
+      
 
     res.json({ message: "Warden updated successfully!" });
   } catch (err) {
