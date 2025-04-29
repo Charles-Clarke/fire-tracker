@@ -3,6 +3,7 @@ import axios from 'axios';
 import WardenForm from './WardenForm';
 import MapDashboard from './MapDashboard';
 import LoginPage from './LoginPage';
+import UserManagement from './UserManagement';
 import { buildingList } from './constants/buildings';
 
 const App = () => {
@@ -83,7 +84,6 @@ const App = () => {
     <div className="App">
       <h1>Fire Warden Tracker</h1>
 
-      {/* Logout button */}
       <button onClick={handleLogout} style={{ marginBottom: '20px', backgroundColor: '#e60000', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
         Logout
       </button>
@@ -174,6 +174,10 @@ const App = () => {
             </tbody>
           </table>
 
+          {/* ✅ Admin-only: User management */}
+          <UserManagement />
+
+          {/* Map */}
           <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
         </>
       )}
