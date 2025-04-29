@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const bcrypt = require("bcrypt"); // ✅ add this
+
 const { connectToDatabase, sql } = require("./db");
 
 connectToDatabase(); // Connect to Azure SQL
@@ -10,7 +12,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-// Health check route
+// Health check
 app.get("/", (req, res) => {
   res.send("Fire Warden Tracker API is running!");
 });
@@ -39,7 +41,7 @@ app.post("/api/wardens", async (req, res) => {
       .input("last_name", sql.VarChar(50), last_name)
       .input("location", sql.VarChar(100), location)
       .query(`
-        INSERT INTO fire_wardens (staff_number, first_name, last_name, location,time_logged)
+        INSERT INTO fire_wardens (staff_number, first_name, last_name, location, time_logged)
         VALUES (@staff_number, @first_name, @last_name, @location, GETDATE())
       `);
 
@@ -69,9 +71,6 @@ app.put("/api/wardens/:id", async (req, res) => {
   const { id } = req.params;
   const { staff_number, first_name, last_name, location } = req.body;
 
-  console.log("Updating ID:", id);
-  console.log("Data:", req.body);
-
   try {
     const request = new sql.Request();
     await request
@@ -89,12 +88,44 @@ app.put("/api/wardens/:id", async (req, res) => {
             time_logged = GETDATE()
         WHERE id = @id
       `);
-      
 
     res.json({ message: "Warden updated successfully!" });
   } catch (err) {
     console.error("Update failed:", err);
     res.status(500).json({ error: "Failed to update warden" });
+  }
+});
+
+// ✅ Secure user login
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const request = new sql.Request();
+    const result = await request
+      .input('username', sql.VarChar, username)
+      .query('SELECT * FROM users WHERE username = @username');
+
+    const user = result.recordset[0];
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    // ✅ Compare hashed password
+    const match = await bcrypt.compare(password, user.password_hash);
+    if (!match) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    // ✅ Success
+    res.json({
+      message: 'Login successful',
+      role: user.role
+    });
+  } catch (err) {
+    console.error('Login failed:', err);
+    res.status(500).json({ error: 'Login error' });
   }
 });
 

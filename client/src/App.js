@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import WardenForm from './WardenForm';
 import MapDashboard from './MapDashboard';
+import LoginPage from './LoginPage';
 import { buildingList } from './constants/buildings';
-
 
 const App = () => {
   const [wardens, setWardens] = useState([]);
@@ -14,6 +14,7 @@ const App = () => {
     last_name: '',
     location: ''
   });
+  const [role, setRole] = useState(sessionStorage.getItem('role') || '');
 
   const fetchWardens = async () => {
     try {
@@ -64,97 +65,118 @@ const App = () => {
   };
 
   useEffect(() => {
-    fetchWardens();
-  }, []);
+    if (role) {
+      fetchWardens();
+    }
+  }, [role]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('role');
+    setRole('');
+  };
+
+  if (!role) {
+    return <LoginPage onLogin={setRole} />;
+  }
 
   return (
     <div className="App">
       <h1>Fire Warden Tracker</h1>
 
-      {/* Form */}
-      <WardenForm onWardenAdded={fetchWardens} />
+      {/* Logout button */}
+      <button onClick={handleLogout} style={{ marginBottom: '20px', backgroundColor: '#e60000', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
+        Logout
+      </button>
 
-      {/* Table */}
-      <h2>All Fire Wardens</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Staff Number</th>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Time Logged</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {wardens.length === 0 ? (
-            <tr><td colSpan="5">No records found.</td></tr>
-          ) : (
-            wardens.map((warden) => (
-              <tr key={warden.id}>
-                {editId === warden.id ? (
-                  <>
-                    <td>
-                      <input
-                        name="staff_number"
-                        value={editData.staff_number}
-                        onChange={handleEditChange}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        name="first_name"
-                        value={editData.first_name}
-                        onChange={handleEditChange}
-                        placeholder="First"
-                      />
-                      <input
-                        name="last_name"
-                        value={editData.last_name}
-                        onChange={handleEditChange}
-                        placeholder="Last"
-                      />
-                    </td>
-                    <td>
-                    <select
-  name="location"
-  value={editData.location}
-  onChange={handleEditChange}
->
-  <option value="">Select Location</option>
-  {Object.keys(buildingList).map((loc) => (
-    <option key={loc} value={loc}>
-      {loc}
-    </option>
-  ))}
-</select>
+      {/* Warden View */}
+      {role === 'warden' && (
+        <>
+          <WardenForm onWardenAdded={fetchWardens} />
+          <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
+        </>
+      )}
 
-                    </td>
-                    <td>{new Date(warden.time_logged).toLocaleString()}</td>
-                    <td>
-                      <button onClick={() => handleSave(warden.id)}>Save</button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td>{warden.staff_number}</td>
-                    <td>{warden.first_name} {warden.last_name}</td>
-                    <td>{warden.location}</td>
-                    <td>{new Date(warden.time_logged).toLocaleString()}</td>
-                    <td>
-                      <button onClick={() => handleEditClick(warden)}>Edit</button>
-                      <button onClick={() => handleDelete(warden.id)}>Delete</button>
-                    </td>
-                  </>
-                )}
+      {/* Admin View */}
+      {role === 'admin' && (
+        <>
+          <h2>All Fire Wardens</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Staff Number</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Time Logged</th>
+                <th>Actions</th>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {wardens.length === 0 ? (
+                <tr><td colSpan="5">No records found.</td></tr>
+              ) : (
+                wardens.map((warden) => (
+                  <tr key={warden.id}>
+                    {editId === warden.id ? (
+                      <>
+                        <td>
+                          <input
+                            name="staff_number"
+                            value={editData.staff_number}
+                            onChange={handleEditChange}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            name="first_name"
+                            value={editData.first_name}
+                            onChange={handleEditChange}
+                            placeholder="First"
+                          />
+                          <input
+                            name="last_name"
+                            value={editData.last_name}
+                            onChange={handleEditChange}
+                            placeholder="Last"
+                          />
+                        </td>
+                        <td>
+                          <select
+                            name="location"
+                            value={editData.location}
+                            onChange={handleEditChange}
+                          >
+                            <option value="">Select Location</option>
+                            {Object.keys(buildingList).map((loc) => (
+                              <option key={loc} value={loc}>{loc}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td>{new Date(warden.time_logged).toLocaleString()}</td>
+                        <td>
+                          <button onClick={() => handleSave(warden.id)}>Save</button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td>{warden.staff_number}</td>
+                        <td>{warden.first_name} {warden.last_name}</td>
+                        <td>{warden.location}</td>
+                        <td>{new Date(warden.time_logged).toLocaleString()}</td>
+                        <td>
+                          <button onClick={() => handleEditClick(warden)}>Edit</button>
+                          <button onClick={() => handleDelete(warden.id)}>Delete</button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
 
-      {/* Map */}
-      <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
+          <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
+        </>
+      )}
     </div>
   );
 };
