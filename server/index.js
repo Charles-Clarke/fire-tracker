@@ -119,8 +119,13 @@ app.post('/api/login', async (req, res) => {
 
     res.json({
       message: 'Login successful',
-      role: user.role
+      role: user.role,
+      staff_number: user.staff_number,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      full_name: user.full_name
     });
+    
   } catch (err) {
     console.error('Login failed:', err);
     res.status(500).json({ error: 'Login error' });
@@ -212,5 +217,40 @@ app.put('/api/users/:id', async (req, res) => {
   } catch (err) {
     console.error("Update user failed:", err);
     res.status(500).json({ error: "Failed to update user" });
+  }
+});
+
+app.post("/api/wardens/self", async (req, res) => {
+  const { location, username } = req.body;
+
+  try {
+    const request = new sql.Request();
+    const result = await request
+      .input("username", sql.VarChar, username)
+      .query(`SELECT full_name, staff_number FROM users WHERE username = @username`);
+
+    const user = result.recordset[0];
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const [first_name, ...rest] = user.full_name.split(" ");
+    const last_name = rest.join(" ");
+
+    await new sql.Request()
+      .input("staff_number", sql.VarChar(20), user.staff_number)
+      .input("first_name", sql.VarChar(50), first_name)
+      .input("last_name", sql.VarChar(50), last_name)
+      .input("location", sql.VarChar(100), location)
+      .query(`
+        INSERT INTO fire_wardens (staff_number, first_name, last_name, location, time_logged)
+        VALUES (@staff_number, @first_name, @last_name, @location, GETDATE())
+      `);
+
+    res.status(201).json({ message: "Location updated successfully" });
+  } catch (err) {
+    console.error("Warden self-update failed:", err);
+    res.status(500).json({ error: "Could not log location" });
   }
 });

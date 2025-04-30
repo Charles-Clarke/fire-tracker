@@ -5,6 +5,8 @@ import MapDashboard from './MapDashboard';
 import LoginPage from './LoginPage';
 import UserManagement from './UserManagement';
 import { buildingList } from './constants/buildings';
+import WardenSelfForm from './WardenSelfForm';
+
 
 const App = () => {
   const [wardens, setWardens] = useState([]);
@@ -89,12 +91,13 @@ const App = () => {
       </button>
 
       {/* Warden View */}
-      {role === 'warden' && (
-        <>
-          <WardenForm onWardenAdded={fetchWardens} />
-          <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
-        </>
-      )}
+{role.toLowerCase() === 'warden' && (
+  <>
+    <WardenSelfForm />
+    <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
+  </>
+)}
+
 
       {/* Admin View */}
       {role === 'admin' && (
