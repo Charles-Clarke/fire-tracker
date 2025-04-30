@@ -6,6 +6,8 @@ import LoginPage from './LoginPage';
 import UserManagement from './UserManagement';
 import { buildingList } from './constants/buildings';
 import WardenSelfForm from './WardenSelfForm';
+import './App.css';
+
 
 
 const App = () => {

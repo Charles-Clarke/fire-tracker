@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { buildingList } from './constants/buildings';
+import './App.css';
+
 
 const WardenSelfForm = () => {
   const [location, setLocation] = useState('');
