@@ -96,7 +96,6 @@ app.put("/api/wardens/:id", async (req, res) => {
   }
 });
 
-// ✅ Secure user login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -112,6 +111,20 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
+    // ✅ First-time login if no password_hash is set
+    if (!user.password_hash) {
+      return res.json({
+        firstTimeLogin: true,
+        username: user.username,
+        role: user.role,
+        staff_number: user.staff_number || '',
+        full_name: user.full_name || '',
+        first_name: user.first_name || '',
+        last_name: user.last_name || ''
+      });
+    }
+
+    // ✅ Normal login check
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) {
       return res.status(401).json({ error: 'Invalid username or password' });
@@ -125,39 +138,29 @@ app.post('/api/login', async (req, res) => {
       last_name: user.last_name,
       full_name: user.full_name
     });
-    
+
   } catch (err) {
     console.error('Login failed:', err);
     res.status(500).json({ error: 'Login error' });
   }
 });
 
-// ✅ Get all users
-app.get('/api/users', async (req, res) => {
-  try {
-    const request = new sql.Request();
-    const result = await request.query(`
-      SELECT id, username, full_name, email, staff_number, role
-      FROM users
-      ORDER BY username
-    `);
-    res.json(result.recordset);
-  } catch (err) {
-    console.error("Failed to fetch users:", err);
-    res.status(500).json({ error: "Failed to fetch users" });
-  }
-});
 
-// ✅ Add a new user
 app.post('/api/users', async (req, res) => {
   const { username, password, full_name, email, staff_number, role } = req.body;
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
     const request = new sql.Request();
+
+    // Only hash password if it was provided
+    let passwordHash = null;
+    if (password && password.trim() !== '') {
+      passwordHash = await bcrypt.hash(password, 10);
+    }
+
     await request
       .input('username', sql.VarChar(100), username)
-      .input('password_hash', sql.VarChar(255), hashedPassword)
+      .input('password_hash', sql.VarChar(255), passwordHash)
       .input('full_name', sql.VarChar(255), full_name)
       .input('email', sql.VarChar(255), email)
       .input('staff_number', sql.VarChar(50), staff_number)
@@ -173,6 +176,8 @@ app.post('/api/users', async (req, res) => {
     res.status(500).json({ error: "Failed to add user." });
   }
 });
+
+
 
 // ✅ Delete a user
 app.delete('/api/users/:id', async (req, res) => {
@@ -254,3 +259,48 @@ app.post("/api/wardens/self", async (req, res) => {
     res.status(500).json({ error: "Could not log location" });
   }
 });
+
+// ✅ Get all users (for User Management page)
+app.get('/api/users', async (req, res) => {
+  try {
+    const request = new sql.Request();
+    const result = await request.query(`
+      SELECT id, username, full_name, email, staff_number, role
+      FROM users
+      ORDER BY username
+    `);
+    res.json(result.recordset);
+  } catch (err) {
+    console.error("Failed to fetch users:", err);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+
+// ✅ Set or update user password
+app.post('/api/set-password', async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Missing username or password' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const request = new sql.Request();
+    await request
+      .input('username', sql.VarChar, username)
+      .input('password_hash', sql.VarChar, hashedPassword)
+      .query(`
+        UPDATE users
+        SET password_hash = @password_hash
+        WHERE username = @username
+      `);
+
+    res.json({ message: 'Password set successfully!' });
+  } catch (err) {
+    console.error('Set password failed:', err);
+    res.status(500).json({ error: 'Failed to set password' });
+  }
+});
+

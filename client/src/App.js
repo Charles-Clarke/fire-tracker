@@ -6,9 +6,8 @@ import LoginPage from './LoginPage';
 import UserManagement from './UserManagement';
 import { buildingList } from './constants/buildings';
 import WardenSelfForm from './WardenSelfForm';
+import SetPasswordPage from './SetPasswordPage';
 import './App.css';
-
-
 
 const App = () => {
   const [wardens, setWardens] = useState([]);
@@ -19,7 +18,9 @@ const App = () => {
     last_name: '',
     location: ''
   });
+
   const [role, setRole] = useState(sessionStorage.getItem('role') || '');
+  const [setupUser, setSetupUser] = useState('');
 
   const fetchWardens = async () => {
     try {
@@ -70,36 +71,59 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (role) {
+    if (role === 'admin' || role.toLowerCase() === 'warden') {
       fetchWardens();
     }
   }, [role]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('role');
+    sessionStorage.clear();
     setRole('');
+    setSetupUser('');
   };
 
+  // ✅ First-time password setup
   if (!role) {
-    return <LoginPage onLogin={setRole} />;
+    return <LoginPage onLogin={(r, u) => {
+      if (r === 'set-password') {
+        setSetupUser(u);
+        setRole('set-password');
+      } else {
+        setRole(r);
+      }
+    }} />;
+  }
+
+  if (role === 'set-password') {
+    return <SetPasswordPage username={setupUser} onComplete={() => setRole('')} />;
   }
 
   return (
     <div className="App">
       <h1>Fire Warden Tracker</h1>
 
-      <button onClick={handleLogout} style={{ marginBottom: '20px', backgroundColor: '#e60000', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
+      <button
+        onClick={handleLogout}
+        style={{
+          marginBottom: '20px',
+          backgroundColor: '#e60000',
+          color: 'white',
+          border: 'none',
+          padding: '8px 16px',
+          borderRadius: '4px',
+          cursor: 'pointer'
+        }}
+      >
         Logout
       </button>
 
       {/* Warden View */}
-{role.toLowerCase() === 'warden' && (
-  <>
-    <WardenSelfForm />
-    <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
-  </>
-)}
-
+      {role.toLowerCase() === 'warden' && (
+        <>
+          <WardenSelfForm />
+          <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
+        </>
+      )}
 
       {/* Admin View */}
       {role === 'admin' && (
@@ -179,10 +203,7 @@ const App = () => {
             </tbody>
           </table>
 
-          {/* ✅ Admin-only: User management */}
           <UserManagement />
-
-          {/* Map */}
           <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
         </>
       )}

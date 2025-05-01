@@ -42,8 +42,22 @@ const UserManagement = () => {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
+  
+    const payload = {
+      username: newUser.username,
+      full_name: newUser.full_name,
+      email: newUser.email,
+      staff_number: newUser.staff_number,
+      role: newUser.role
+    };
+  
+    // Only include password if it’s been set (e.g. for admin accounts)
+    if (newUser.password && newUser.password.trim() !== '') {
+      payload.password = newUser.password;
+    }
+  
     try {
-      await axios.post('http://localhost:5000/api/users', newUser);
+      await axios.post('http://localhost:5000/api/users', payload);
       setNewUser({
         username: '',
         full_name: '',
@@ -58,6 +72,7 @@ const UserManagement = () => {
       alert('Failed to add user.');
     }
   };
+  
 
   const handleEditClick = (user) => {
     setEditingId(user.id);
@@ -98,7 +113,6 @@ const UserManagement = () => {
         <input name="full_name" placeholder="Full Name" value={newUser.full_name} onChange={handleAddChange} required />
         <input name="email" placeholder="Email" value={newUser.email} onChange={handleAddChange} required />
         <input name="staff_number" placeholder="Staff Number" value={newUser.staff_number} onChange={handleAddChange} required />
-        <input type="password" name="password" placeholder="Password" value={newUser.password} onChange={handleAddChange} required />
         <select name="role" value={newUser.role} onChange={handleAddChange}>
           <option value="warden">Warden</option>
           <option value="admin">Admin</option>
