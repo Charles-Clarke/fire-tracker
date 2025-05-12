@@ -1,69 +1,41 @@
-name: Build and deploy Node.js app to Azure Web App - fire-tracker-charlie
+name: Deploy Fire Tracker to Azure
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
 
-      - name: Install server dependencies
-        run: |
-          cd server
-          npm install
-
-      - name: Install and build client app
+      - name: Install & Build React (client)
         run: |
           cd client
           npm install
           npm run build
 
-      - name: Copy client build to server/public
+      - name: Install Express dependencies (server)
+        run: |
+          cd server
+          npm install
+
+      - name: Copy React build to Express public folder
         run: |
           rm -rf server/public
           mkdir -p server/public
           cp -r client/build/* server/public/
 
-      - name: Zip artifact for deployment
-        run: |
-          cd server
-          zip -r ../release.zip .
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app
-          path: release.zip
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: app
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6A6C93A1D06142549BC6A8976D63D616 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3180BDA74B9E4B9DBF0B9419A790B71E }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_1A4906CF8EDD40049D4C397F1FD611A5 }}
-
-      - name: Deploy to Azure Web App
+      - name: Deploy Express to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'fire-tracker-charlie'
-          slot-name: 'Production'
-          package: release.zip
+          package: ./server
