@@ -2,8 +2,6 @@ import './MapDashboard.css';
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
-
-
 const buildings = [
   { name: 'Alwyn Hall', left: '42.6%', top: '72.1%' },
   { name: 'Beech Glade', left: '82.3%', top: '92.5%' },
@@ -39,11 +37,11 @@ const buildings = [
 ];
 
 function MapDashboard({ wardens }) {
-  const [tick, setTick] = useState(0);
+  const [, forceRerender] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTick((prev) => prev + 1); // 🔁 force re-render every 60s
+      forceRerender((prev) => prev + 1);
     }, 60000);
 
     return () => clearInterval(interval);
@@ -56,14 +54,14 @@ function MapDashboard({ wardens }) {
       return w.location === building && loggedDate === today;
     });
 
-if (record) {
-  const minsAgo = Math.round((new Date() - new Date(record.time_logged)) / 60000);
-  return {
-    status: 'active',
-    name: record.full_name,
-    minsAgo
-  };
-}
+    if (record) {
+      const minsAgo = Math.round((new Date() - new Date(record.time_logged)) / 60000);
+      return {
+        status: 'active',
+        name: record.full_name,
+        minsAgo
+      };
+    }
 
     return { status: 'inactive' };
   };
