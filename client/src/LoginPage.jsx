@@ -8,11 +8,13 @@ const LoginPage = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const API_URL = "https://charlie-fire-warden-agq9geaqdbcpqe3.uksouth-01.azurewebsites.net/api";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
   
     try {
-      const response = await axios.post('http://localhost:5000/api/login', {
+      const response = await axios.post(`${API_URL}/login`, {
         username,
         password,
       });
