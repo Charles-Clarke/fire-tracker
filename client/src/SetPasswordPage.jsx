@@ -13,15 +13,14 @@ const SetPasswordPage = ({ username, onComplete }) => {
       return;
     }
 
-    const username = sessionStorage.getItem('username');
     try {
       await axios.post('http://localhost:5000/api/set-password', {
-        username: sessionStorage.getItem('username'),
+        username,
         password: newPass
       });
       alert('Password set! Please log in.');
       sessionStorage.removeItem('username');
-      onComplete(); // Go back to login
+      onComplete();
     } catch (err) {
       console.error('Set password error:', err);
       setError('Failed to set password');
