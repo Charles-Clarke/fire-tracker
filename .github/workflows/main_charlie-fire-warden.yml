@@ -29,6 +29,6 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'YOUR_APP_SERVICE_NAME_HERE'
+          app-name: 'charlie-fire-warden'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: ./backend
+          package: ./server
