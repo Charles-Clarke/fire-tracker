@@ -56,14 +56,15 @@ function MapDashboard({ wardens }) {
       return w.location === building && loggedDate === today;
     });
 
-    if (record) {
-      const minsAgo = Math.round((new Date() - new Date(record.time_logged)) / 60000);
-      return {
-        status: 'active',
-        name: `${record.first_name} ${record.last_name}`,
-        minsAgo
-      };
-    }
+if (record) {
+  const minsAgo = Math.round((new Date() - new Date(record.time_logged)) / 60000);
+  return {
+    status: 'active',
+    name: record.full_name,
+    minsAgo
+  };
+}
+
     return { status: 'inactive' };
   };
 

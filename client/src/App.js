@@ -22,6 +22,25 @@ const App = () => {
   const [role, setRole] = useState(sessionStorage.getItem('role') || '');
   const [setupUser, setSetupUser] = useState('');
 
+useEffect(() => {
+  if (!role) {
+    // Only apply background on login page
+    document.body.style.background = `url(${process.env.PUBLIC_URL}/West-Downs-Web-copy.jpg) no-repeat center center fixed`;
+    document.body.style.backgroundSize = 'cover';
+  } else {
+    // Remove background when logged in
+    document.body.style.background = '';
+    document.body.style.backgroundSize = '';
+  }
+
+  return () => {
+    // Cleanup when component unmounts
+    document.body.style.background = '';
+    document.body.style.backgroundSize = '';
+  };
+}, [role]);
+
+
   const fetchWardens = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/wardens');
@@ -98,6 +117,7 @@ const App = () => {
     return <SetPasswordPage username={setupUser} onComplete={() => setRole('')} />;
   }
 
+
   return (
     <div className="App">
       <h1>Fire Warden Tracker</h1>
@@ -156,17 +176,13 @@ const App = () => {
                         </td>
                         <td>
                           <input
-                            name="first_name"
-                            value={editData.first_name}
+                            name="full_name"
+                            value={editData.full_name}
                             onChange={handleEditChange}
-                            placeholder="First"
+                            placeholder="Full name"
                           />
-                          <input
-                            name="last_name"
-                            value={editData.last_name}
-                            onChange={handleEditChange}
-                            placeholder="Last"
-                          />
+                          
+                          
                         </td>
                         <td>
                           <select
@@ -188,7 +204,7 @@ const App = () => {
                     ) : (
                       <>
                         <td>{warden.staff_number}</td>
-                        <td>{warden.first_name} {warden.last_name}</td>
+                        <td>{warden.full_name}</td>
                         <td>{warden.location}</td>
                         <td>{new Date(warden.time_logged).toLocaleString()}</td>
                         <td>

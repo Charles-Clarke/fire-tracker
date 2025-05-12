@@ -56,7 +56,11 @@ form {
   max-width: 400px;
   margin: 60px auto;
   padding: 24px;
-  background: white;
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
 }
+
+

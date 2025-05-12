@@ -21,13 +21,20 @@ app.get("/", (req, res) => {
 app.get("/api/wardens", async (req, res) => {
   try {
     const request = new sql.Request();
-    const result = await request.query("SELECT * FROM fire_wardens ORDER BY timestamp DESC");
+    const result = await request.query(`
+      SELECT fw.id, fw.staff_number, fw.location, fw.time_logged, 
+             u.full_name
+      FROM fire_wardens fw
+      LEFT JOIN users u ON fw.staff_number = u.staff_number
+      ORDER BY fw.time_logged DESC
+    `);
     res.json(result.recordset);
   } catch (err) {
     console.error("Fetch failed:", err);
     res.status(500).json({ error: "Failed to fetch wardens" });
   }
 });
+
 
 // Add a new warden
 app.post("/api/wardens", async (req, res) => {
