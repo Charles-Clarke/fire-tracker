@@ -26,12 +26,9 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_DELIGHTFUL_POND_0E54F7103 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "./client" # App source code path
-          api_location: "./server" # Api source code path - optional
-          output_location: "build" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          app_location: "./client"
+          api_location: "" # <=== Leave blank
+          output_location: "build" # Built React app content
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
