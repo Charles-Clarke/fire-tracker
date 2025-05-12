@@ -12,10 +12,10 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-// Health check
-app.get("/", (req, res) => {
-  res.send("Fire Warden Tracker API is running!");
+app.get('/api/health', (req, res) => {
+  res.send({ status: 'Backend is running' });
 });
+
 
 // Get all wardens
 app.get("/api/wardens", async (req, res) => {
