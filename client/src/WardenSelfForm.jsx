@@ -4,7 +4,7 @@ import { buildingList } from './constants/buildings';
 import './App.css';
 
 
-const WardenSelfForm = () => {
+const WardenSelfForm = ({ refreshWardens }) => {
   const [location, setLocation] = useState('');
   const [message, setMessage] = useState('');
 
@@ -30,8 +30,9 @@ const WardenSelfForm = () => {
         location
       });
 
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         setMessage('✅ Your location has been logged!');
+        if (refreshWardens) refreshWardens();
       } else {
         setMessage('❌ Failed to log location.');
       }

@@ -36,28 +36,61 @@ app.get("/api/wardens", async (req, res) => {
 });
 
 
-// Add a new warden
+
 app.post("/api/wardens", async (req, res) => {
   const { staff_number, first_name, last_name, location } = req.body;
 
+  if (!staff_number || !location) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
   try {
     const request = new sql.Request();
-    await request
+
+    // Check if this warden has already logged today
+    const result = await request
       .input("staff_number", sql.VarChar(20), staff_number)
-      .input("first_name", sql.VarChar(50), first_name)
-      .input("last_name", sql.VarChar(50), last_name)
-      .input("location", sql.VarChar(100), location)
       .query(`
-        INSERT INTO fire_wardens (staff_number, first_name, last_name, location, time_logged)
-        VALUES (@staff_number, @first_name, @last_name, @location, GETDATE())
+        SELECT id FROM fire_wardens
+        WHERE staff_number = @staff_number
+        AND CAST(time_logged AS DATE) = CAST(GETDATE() AS DATE)
       `);
 
-    res.status(201).json({ message: "Fire warden added successfully!" });
+    if (result.recordset.length > 0) {
+      // ✅ Update existing location log
+      const existingId = result.recordset[0].id;
+
+      await new sql.Request()
+        .input("id", sql.Int, existingId)
+        .input("location", sql.VarChar(100), location)
+        .query(`
+          UPDATE fire_wardens
+          SET location = @location,
+              time_logged = GETDATE()
+          WHERE id = @id
+        `);
+
+      return res.json({ message: "Location updated successfully!" });
+    } else {
+      // ✅ Insert new location log
+      await new sql.Request()
+        .input("staff_number", sql.VarChar(20), staff_number)
+        .input("first_name", sql.VarChar(50), first_name || '')
+        .input("last_name", sql.VarChar(50), last_name || '')
+        .input("location", sql.VarChar(100), location)
+        .query(`
+          INSERT INTO fire_wardens (staff_number, first_name, last_name, location, time_logged)
+          VALUES (@staff_number, @first_name, @last_name, @location, GETDATE())
+        `);
+
+      return res.status(201).json({ message: "Location logged successfully!" });
+    }
   } catch (err) {
-    console.error("Insert failed:", err);
-    res.status(500).json({ error: "Failed to insert fire warden" });
+    console.error("Warden log failed:", err);
+    res.status(500).json({ error: "Failed to log location" });
   }
 });
+
 
 // Delete a warden
 app.delete("/api/wardens/:id", async (req, res) => {
@@ -232,40 +265,7 @@ app.put('/api/users/:id', async (req, res) => {
   }
 });
 
-app.post("/api/wardens/self", async (req, res) => {
-  const { location, username } = req.body;
 
-  try {
-    const request = new sql.Request();
-    const result = await request
-      .input("username", sql.VarChar, username)
-      .query(`SELECT full_name, staff_number FROM users WHERE username = @username`);
-
-    const user = result.recordset[0];
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const [first_name, ...rest] = user.full_name.split(" ");
-    const last_name = rest.join(" ");
-
-    await new sql.Request()
-      .input("staff_number", sql.VarChar(20), user.staff_number)
-      .input("first_name", sql.VarChar(50), first_name)
-      .input("last_name", sql.VarChar(50), last_name)
-      .input("location", sql.VarChar(100), location)
-      .query(`
-        INSERT INTO fire_wardens (staff_number, first_name, last_name, location, time_logged)
-        VALUES (@staff_number, @first_name, @last_name, @location, GETDATE())
-      `);
-
-    res.status(201).json({ message: "Location updated successfully" });
-  } catch (err) {
-    console.error("Warden self-update failed:", err);
-    res.status(500).json({ error: "Could not log location" });
-  }
-});
 
 // ✅ Get all users (for User Management page)
 app.get('/api/users', async (req, res) => {

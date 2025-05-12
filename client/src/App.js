@@ -140,7 +140,7 @@ useEffect(() => {
       {/* Warden View */}
       {role.toLowerCase() === 'warden' && (
         <>
-          <WardenSelfForm />
+          <WardenSelfForm refreshWardens={fetchWardens} />
           <MapDashboard wardens={wardens} key={JSON.stringify(wardens)} />
         </>
       )}
