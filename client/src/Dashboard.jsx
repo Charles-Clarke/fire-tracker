@@ -19,7 +19,7 @@ function Dashboard() {
 
   const fetchWardens = async () => {
     try {
-      const res = await axios.get('${API_URL}/wardens');
+      const res = await axios.get(`${API_URL}/wardens`);
       setWardens(res.data);
     } catch (err) {
       console.error('Error fetching wardens:', err);
