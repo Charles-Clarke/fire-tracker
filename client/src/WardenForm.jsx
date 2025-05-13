@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { buildingList } from './constants/buildings';
 
+const API_URL = "https://charlie-fire-warden-aqg9geaqdbcpcpe3.uksouth-01.azurewebsites.net/api";
+
 const WardenForm = ({ onWardenAdded }) => {
   const [staffNumber, setStaffNumber] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -19,7 +21,7 @@ const WardenForm = ({ onWardenAdded }) => {
     console.log("🔄 Submitting warden form...");
 
     try {
-      const response = await axios.post("http://localhost:5000/api/wardens", {
+      const response = await axios.post("${API_URL}/wardens", {
         staff_number: staffNumber,
         first_name: firstName,
         last_name: lastName,
