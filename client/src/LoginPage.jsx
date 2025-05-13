@@ -8,7 +8,7 @@ const LoginPage = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const API_URL = "https://charlie-fire-warden-agq9geaqdbcpqe3.uksouth-01.azurewebsites.net/api";
+  const API_URL = "https://charlie-fire-warden-aqg9geaqdbcpcpe3.uksouth-01.azurewebsites.net/api";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
