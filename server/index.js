@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 const { connectToDatabase, sql } = require("./db");
 
-connectToDatabase(); // Connect to Azure SQL
+connectToDatabase();
 
 const app = express();
 app.use(cors());
