@@ -44,7 +44,7 @@ useEffect(() => {
 
   const fetchWardens = async () => {
     try {
-      const response = await axios.get('${API_URL}/wardens');
+      const response = await axios.get(`${API_URL}/wardens`);
       setWardens(response.data);
     } catch (error) {
       console.error('Failed to fetch wardens:', error);

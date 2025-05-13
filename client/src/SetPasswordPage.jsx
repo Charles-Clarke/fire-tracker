@@ -16,7 +16,7 @@ const SetPasswordPage = ({ username, onComplete }) => {
     }
 
     try {
-      await axios.post('${API_URL}/set-password', {
+      await axios.post(`${API_URL}/set-password`, {
         username,
         password: newPass
       });

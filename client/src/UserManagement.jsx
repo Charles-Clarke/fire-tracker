@@ -19,7 +19,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('${API_URL}/users');
+      const res = await axios.get(`${API_URL}/users`);
       setUsers(res.data);
     } catch (err) {
       console.error('Failed to fetch users:', err);
@@ -58,7 +58,7 @@ const UserManagement = () => {
     }
   
     try {
-      await axios.post('${API_URL}/users', payload);
+      await axios.post(`${API_URL}/users`, payload);
       setNewUser({
         username: '',
         full_name: '',
