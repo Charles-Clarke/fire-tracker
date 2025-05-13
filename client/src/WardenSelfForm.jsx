@@ -24,7 +24,7 @@ const WardenSelfForm = ({ refreshWardens }) => {
     }
 
     try {
-      const response = await axios.post('${API_URL}/wardens', {
+      const response = await axios.post(`${API_URL}/wardens`, {
         staff_number,
         first_name,
         last_name,
