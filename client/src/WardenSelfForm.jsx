@@ -3,6 +3,7 @@ import axios from 'axios';
 import { buildingList } from './constants/buildings';
 import './App.css';
 
+const API_URL = "https://charlie-fire-warden-aqg9geaqdbcpcpe3.uksouth-01.azurewebsites.net/api";
 
 const WardenSelfForm = ({ refreshWardens }) => {
   const [location, setLocation] = useState('');
@@ -23,7 +24,7 @@ const WardenSelfForm = ({ refreshWardens }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/wardens', {
+      const response = await axios.post('${API_URL}/wardens', {
         staff_number,
         first_name,
         last_name,
