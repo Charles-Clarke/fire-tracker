@@ -19,7 +19,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/users');
+      const res = await axios.get('${API_URL}/users');
       setUsers(res.data);
     } catch (err) {
       console.error('Failed to fetch users:', err);
@@ -29,7 +29,7 @@ const UserManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/users/${id}`);
+      await axios.delete(`${API_URL}/users/${id}`);
       fetchUsers();
     } catch (err) {
       console.error('Delete failed:', err);
@@ -58,7 +58,7 @@ const UserManagement = () => {
     }
   
     try {
-      await axios.post('http://localhost:5000/api/users', payload);
+      await axios.post('${API_URL}/users', payload);
       setNewUser({
         username: '',
         full_name: '',
@@ -91,7 +91,7 @@ const UserManagement = () => {
 
   const handleSaveEdit = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/users/${editingId}`, editData);
+      await axios.put(`${API_URL}/users/${editingId}`, editData);
       setEditingId(null);
       fetchUsers();
     } catch (err) {
