@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API_URL = "https://charlie-fire-warden-aqg9geaqdbcpcpe3.uksouth-01.azurewebsites.net/api";
+
 const SetPasswordPage = ({ username, onComplete }) => {
   const [newPass, setNewPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
@@ -14,7 +16,7 @@ const SetPasswordPage = ({ username, onComplete }) => {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/set-password', {
+      await axios.post('${API_URL}/set-password', {
         username,
         password: newPass
       });
