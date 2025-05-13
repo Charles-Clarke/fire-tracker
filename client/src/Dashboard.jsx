@@ -15,9 +15,11 @@ function Dashboard() {
     fetchWardens();
   }, []);
 
+  const API_URL = "https://charlie-fire-warden-aqg9geaqdbcpcpe3.uksouth-01.azurewebsites.net/api";
+
   const fetchWardens = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/wardens');
+      const res = await axios.get('${API_URL}/wardens');
       setWardens(res.data);
     } catch (err) {
       console.error('Error fetching wardens:', err);
@@ -26,7 +28,7 @@ function Dashboard() {
 
   const deleteWarden = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/wardens/${id}`);
+      await axios.delete(`${API_URL}/wardens/${id}`);
       fetchWardens();
     } catch (err) {
       console.error('Delete error:', err);
@@ -53,7 +55,7 @@ function Dashboard() {
 
   const saveEdit = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/wardens/${id}`, editFormData);
+      await axios.put(`${API_URL}/wardens/${id}`, editFormData);
       setEditId(null);
       fetchWardens();
     } catch (err) {
