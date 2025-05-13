@@ -8,6 +8,8 @@ import WardenSelfForm from './WardenSelfForm';
 import SetPasswordPage from './SetPasswordPage';
 import './App.css';
 
+const API_URL = "https://charlie-fire-warden-aqg9geaqdbcpcpe3.uksouth-01.azurewebsites.net/api";
+
 const App = () => {
   const [wardens, setWardens] = useState([]);
   const [editId, setEditId] = useState(null);
@@ -42,7 +44,7 @@ useEffect(() => {
 
   const fetchWardens = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/wardens');
+      const response = await axios.get('${API_URL}/wardens');
       setWardens(response.data);
     } catch (error) {
       console.error('Failed to fetch wardens:', error);
@@ -52,7 +54,7 @@ useEffect(() => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this warden?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/wardens/${id}`);
+      await axios.delete(`${API_URL}/wardens/${id}`);
       fetchWardens();
     } catch (error) {
       console.error("Delete failed:", error);
@@ -79,7 +81,7 @@ useEffect(() => {
 
   const handleSave = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/wardens/${id}`, editData);
+      await axios.put(`${API_URL}/wardens/${id}`, editData);
       setEditId(null);
       fetchWardens();
     } catch (error) {
