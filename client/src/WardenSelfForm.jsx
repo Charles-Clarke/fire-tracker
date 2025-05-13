@@ -10,10 +10,9 @@ const WardenSelfForm = ({ refreshWardens }) => {
   const [message, setMessage] = useState('');
 
   const staff_number = sessionStorage.getItem('staff_number');
-  const first_name = sessionStorage.getItem('first_name');
-  const last_name = sessionStorage.getItem('last_name');
 
-  console.log({ staff_number, first_name, last_name }); // TEMP debug
+
+  console.log({ staff_number}); // TEMP debug
 
 
   const handleSubmit = async (e) => {
@@ -26,8 +25,6 @@ const WardenSelfForm = ({ refreshWardens }) => {
     try {
       const response = await axios.post(`${API_URL}/wardens`, { //new url
         staff_number,
-        first_name,
-        last_name,
         location
       });
 

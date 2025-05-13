@@ -38,7 +38,7 @@ app.get("/api/wardens", async (req, res) => {
 
 
 app.post("/api/wardens", async (req, res) => {
-  const { staff_number, first_name, last_name, location } = req.body;
+  const { staff_number, location } = req.body;
 
   if (!staff_number || !location) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -75,12 +75,10 @@ app.post("/api/wardens", async (req, res) => {
       // ✅ Insert new location log
       await new sql.Request()
         .input("staff_number", sql.VarChar(20), staff_number)
-        .input("first_name", sql.VarChar(50), first_name || '')
-        .input("last_name", sql.VarChar(50), last_name || '')
         .input("location", sql.VarChar(100), location)
         .query(`
-          INSERT INTO fire_wardens (staff_number, first_name, last_name, location, time_logged)
-          VALUES (@staff_number, @first_name, @last_name, @location, GETDATE())
+          INSERT INTO fire_wardens (staff_number, location, time_logged)
+          VALUES (@staff_number, @location, GETDATE())
         `);
 
       return res.status(201).json({ message: "Location logged successfully!" });
